@@ -1,0 +1,14 @@
+{
+  "name": "chate-app",
+  "version": "1.0.0",
+  "description": "sample chate application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "mahmoud kamal",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
