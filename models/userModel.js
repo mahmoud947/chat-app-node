@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema(
         pic: {
             type: "String",
             default:
-                "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
+                "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
         },
         isAdmin: {
             type: Boolean,
@@ -30,7 +30,7 @@ userSchema.pre("save", async function (next) {
     }
 
     const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
+    this.password = bcrypt.hash(this.password, salt);
 });
 
 const User = mongoose.model("User", userSchema)
