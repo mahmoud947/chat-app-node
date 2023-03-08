@@ -3,6 +3,7 @@ const dotenv = require("dotenv")
 const { chats } = require("./data/data")
 const connectDb = require("./config/db")
 const userRoutes = require("./routes/userRoutes")
+const chatRoutes = require("./routes/chatRoutes")
 
 
 const app = express()
@@ -18,9 +19,9 @@ app.get('/', (req, res) => {
 })
 
 
-app.get('/api/chat', (req, res) => {
-    res.send(chats)
-})
+// app.get('/api/chat', (req, res) => {
+//     res.send(chats)
+// })
 
 app.get('/api/chat/:id', (req, res) => {
     const singleChat = chats.find(c => c._id == req.params.id)
@@ -29,6 +30,8 @@ app.get('/api/chat/:id', (req, res) => {
 })
 
 app.use('/api/user', userRoutes)
+
+app.use('/api/chat', chatRoutes)
 
 
 
