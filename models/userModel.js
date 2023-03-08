@@ -11,6 +11,8 @@ const userSchema = mongoose.Schema(
             default:
                 "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
         },
+        phone: { type: "String", required: true }
+        ,
         isAdmin: {
             type: Boolean,
             required: true,
@@ -30,7 +32,7 @@ userSchema.pre("save", async function (next) {
     }
 
     const salt = await bcrypt.genSalt(10);
-    this.password = bcrypt.hash(this.password, salt);
+    this.password = await bcrypt.hash(this.password, salt);
 });
 
 const User = mongoose.model("User", userSchema)

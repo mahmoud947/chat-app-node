@@ -13,9 +13,6 @@ dotenv.config()
 connectDb()
 
 
-
-
-
 app.get('/', (req, res) => {
     res.json({ message: "hello" })
 })
@@ -32,12 +29,6 @@ app.get('/api/chat/:id', (req, res) => {
 })
 
 app.use('/api/user', userRoutes)
-
-
-
-
-
-
 
 
 
