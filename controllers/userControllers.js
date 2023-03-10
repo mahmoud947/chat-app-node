@@ -73,12 +73,38 @@ const allUsers = asyncHandler(async (req, res) => {
             $or: [
                 { name: { $regex: req.query.search, $options: "i" } },
                 { email: { $regex: req.query.search, $options: "i" } },
+                { phone: { $regex: req.query.search, $options: "i" } },
             ],
         }
         : {};
 
-    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } })
+    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } }).select('-password')
     res.send(users);
 });
 
-module.exports = { registerUser, authUser, allUsers }
+
+const fetchUserByPhoneNumber = asyncHandler(async (req, res) => {
+
+    const keyword = req.body
+        ? {
+            $or: [
+                { name: req.body.name },
+                { email: req.body.email },
+                { phone: req.body.phone },
+            ],
+        }
+        : {};
+
+    const user = await User.findOne(keyword).select('-password')
+
+    if (user) {
+        res.status(200).send(user);
+    } else {
+        res.status(404).json({
+            error: "user not found"
+        })
+    }
+
+})
+
+module.exports = { registerUser, authUser, allUsers, fetchUserByPhoneNumber }
