@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
+const { use } = require("../routes/chatRoutes");
 
 const accessChat = asyncHandler(async (req, res) => {
     const { userId } = req.body
@@ -61,4 +62,44 @@ const fetchChats = asyncHandler(async (req, res) => {
     }
 })
 
-module.exports = { accessChat, fetchChats }
+const createGroupChat = asyncHandler(async (req, res) => {
+    const { users, name } = req.body
+
+    if (!users || !name) {
+        return res.status(400).json({
+            error: "Please fill all felids"
+        })
+    }
+
+    console.log(users);
+    var _users = users
+    if (_users.length < 2) {
+        return res.status(400)
+            .json({
+                error: "group chat required more than 2 users"
+            })
+    }
+
+    _users.push(req.user)
+
+    try {
+        const groupChat = await Chat.create({
+            chatName: name,
+            users: _users,
+            isGroupChat: true,
+            groupAdmin: req.user,
+        })
+
+        const fullGroupChat = await Chat.findOne({ _id: groupChat._id })
+            .populate("users", "-password")
+            .populate("groupAdmin", "-password")
+
+        res.status(200).json(fullGroupChat)
+    } catch (error) {
+        res.status(400).json(error)
+    }
+
+})
+
+
+module.exports = { accessChat, fetchChats, createGroupChat }
