@@ -4,6 +4,8 @@ const Message = require('../models/messageModel')
 const Chat = require("../models/chatModel");
 const User = require("../models/userModel");
 
+
+
 const sendMessage = asyncHandler(async (req, res) => {
     const { content, chatId } = req.body
 

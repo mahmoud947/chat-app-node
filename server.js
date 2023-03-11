@@ -5,9 +5,13 @@ const connectDb = require("./config/db")
 const userRoutes = require("./routes/userRoutes")
 const chatRoutes = require("./routes/chatRoutes")
 const messageRoutes = require('./routes/messageRoute')
-
+const { Server } = require("socket.io");
+const WebSocket = require('ws');
 
 const app = express()
+
+
+
 
 app.use(express.json())
 
@@ -38,4 +42,89 @@ app.use('/api/message', messageRoutes)
 
 
 const PORT = process.env.PORT || 5000
-app.listen(PORT, console.log(`Server Started on Port ${PORT}`))
+const server = app.listen(PORT, console.log(`Server Started on Port ${PORT}`))
+
+
+// const wss = new WebSocket.Server({ server });
+
+// wss.on('connection', (socket) => {
+//     socket.send("hello")
+//     socket.on('message', message => {
+//         let messageParsed = JSON.parse(message);
+//         console.log(messageParsed);
+//         // let messageParsed = JSON.parse(data.join);
+//         //socket.send(message.join)
+//     })
+// })
+
+
+
+
+
+
+
+
+const io = new Server(server, {
+    pingTimeout: 60000,
+    cors: {
+        origin: "http://localhost:5000",
+        // credentials: true,
+    },
+});
+
+
+
+io.on('connection', (socket) => {
+    socket.send("hello")
+    socket.emit('join chat', "hello")
+    socket.on('setup', (userData) => {
+        socket.join(userData._id)
+        socket.emit('connected')
+
+    })
+
+    socket.on('join chat', (chat) => {
+        socket.join(chat._id)
+        console.log("user joined Room " + chat._id);
+    })
+    console.log('new user connected');
+})
+
+
+io.on("connection", (socket) => {
+    console.log("Connected to socket.io");
+    socket.send("hello")
+    socket.emit("connected");
+    socket.on("setup", (userData) => {
+        socket.join(userData._id);
+        socket.emit("connected");
+        socket.send("connected")
+    });
+
+    socket.on("join chat", (room) => {
+        socket.join(room);
+        console.log("User Joined Room: " + room);
+    });
+    socket.on("typing", (room) => socket.in(room).emit("typing"));
+    socket.on("stop typing", (room) => socket.in(room).emit("stop typing"));
+
+    socket.on("new message", (newMessageReceived) => {
+        socket.emit("hello hello hello")
+        var chat = newMessageReceived.chat;
+
+        console.log(chat);
+
+        if (!chat.users) return console.log("chat.users not defined");
+
+        chat.users.forEach((user) => {
+            if (user._id == newMessageReceived.sender._id) return;
+
+            socket.in(user._id).emit("received", newMessageReceived);
+        });
+    });
+
+    socket.off("setup", () => {
+        console.log("USER DISCONNECTED");
+        socket.leave(userData._id);
+    });
+});
