@@ -32,7 +32,32 @@ const protect = asyncHandler(async (req, res, next) => {
     }
 });
 
+const protectSocketIo = asyncHandler(async (socket, next) => {
+    let token;
+
+    if (
+        socket.handshake.headers.authorization &&
+        socket.handshake.headers.authorization.startsWith("Bearer")
+    ) {
+        try {
+            token = socket.handshake.headers.authorization.split(" ")[1];
+
+
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            socket.user = await User.findById(decoded.id).select("-password");
+
+            next();
+        } catch (error) {
+            console.log("ecxxx");
+
+        }
+    }
+
+
+});
 
 
 
-module.exports = { protect };
+
+module.exports = { protect, protectSocketIo };
