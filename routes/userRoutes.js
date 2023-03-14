@@ -28,9 +28,8 @@ router.route("/edit").put(protect, updateUser)
 router.route("/addContact").post(protect, addContact)
 router.route("/contacts").get(protect, fetchContacts)
 router.route("/avatar").post(protect, upload.single('avatar'), async (req, res) => {
-    console.log(req.file.path);
-    const updatedUser = await User.findByIdAndUpdate(req.user._id, { pic: req.file.path })
-    if (updateUser) {
+    const updatedUserAvatar = await User.findByIdAndUpdate(req.user._id, { pic: req.file.filename })
+    if (updatedUserAvatar) {
         res.status(200).json({ "message": "avatar updated successfully" })
     }
 

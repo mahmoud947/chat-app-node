@@ -64,6 +64,9 @@ const fetchChats = asyncHandler(async (req, res) => {
     }
 })
 
+
+
+
 const createGroupChat = asyncHandler(async (req, res) => {
     const { users, name } = req.body
 
@@ -157,4 +160,40 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 
 })
 
-module.exports = { accessChat, fetchChats, createGroupChat, renameGroup, addToGroup, removeFromGroup }
+
+
+const searchChats = asyncHandler(async (req, res) => {
+
+    const keyword = req.query.search
+        ? {
+            $or: [
+                { name: { $regex: req.query.search, $options: "i" } },
+                { email: { $regex: req.query.search, $options: "i" } },
+                { phone: { $regex: req.query.search, $options: "i" } },
+            ],
+        }
+        : {};
+    console.log(keyword);
+
+    try {
+        const userSearched = await User.find(keyword)
+        console.log(userSearched);
+        Chat.find({ contact: userSearched })
+            .populate("users", "-password -contacts")
+            .populate("groupAdmin", "-password -contacts")
+            .populate("latestMessage")
+            .populate("contact", "-password -contacts")
+            .sort({ updatedAt: -1 })
+            .then(async (results) => {
+                results = await User.populate(results, {
+                    path: 'latestMessage.sender',
+                    select: "name pic email"
+                })
+                res.status(200).send(results)
+            })
+    } catch (error) {
+        res.status(400).json(error)
+    }
+})
+
+module.exports = { accessChat, fetchChats, createGroupChat, renameGroup, addToGroup, removeFromGroup, searchChats }
