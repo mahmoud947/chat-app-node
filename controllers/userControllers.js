@@ -10,7 +10,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (!name || !email || !password) {
         resizeBy.status(400).json({
             message: "please Enter all the Fields",
-            status:400
+            status: 400
         })
 
     }
@@ -18,7 +18,7 @@ const registerUser = asyncHandler(async (req, res) => {
     if (userExists) {
         res.status(400).json({
             message: "User already exists",
-            status:400
+            status: 400
         })
 
     }
@@ -42,12 +42,12 @@ const registerUser = asyncHandler(async (req, res) => {
             phone: user.phone,
             token: generateToken(user._id),
             message: "Successfully",
-            status:201
+            status: 201
         })
     } else {
         res.status(400).json({
             message: "Failed to Create User",
-            status:400
+            status: 400
         })
     }
 })
@@ -65,12 +65,12 @@ const authUser = asyncHandler(async (req, res) => {
             phone: user.phone,
             token: generateToken(user._id),
             message: "Successfully",
-            status:200
+            status: 200
         })
     } else {
         res.status(401).json({
             message: "Invalid Email or Password",
-            status:400
+            status: 400
         })
 
     }
@@ -87,14 +87,23 @@ const allUsers = asyncHandler(async (req, res) => {
         }
         : {};
 
-    const users = await User.find(keyword).find({ _id: { $ne: req.user._id } }).select('-password')
-    res.status(200).json(
-        {
-            users:users,
-            message: "Successfully",
-            status:200
-        }
-    );
+    const users = await User.find(keyword).select('-password')
+    if (users) {
+        res.status(200).json(
+            {
+                users: users,
+                message: "Successfully",
+                status: 200
+            }
+        );
+    } else {
+        res.status(404).json({
+            found: false,
+            message: "user not found",
+            status: 404
+        })
+    }
+
 });
 
 
@@ -114,33 +123,68 @@ const fetchUserByPhoneNumber = asyncHandler(async (req, res) => {
 
     if (user) {
         res.status(200).json({
-            found:true,
-            status:200,
+            found: true,
+            status: 200,
             message: "Successfully",
         });
     } else {
         res.status(404).json({
-            found:false,
+            found: false,
             message: "user not found",
-            status:404
+            status: 404
         })
     }
 
 })
 
-const updateUser = asyncHandler(async(req,res)=>{
-    const updatedUser =await User.findOneAndUpdate({phone:req.body.phone},req.body)
-    if(updatedUser){
+const updateUser = asyncHandler(async (req, res) => {
+    const updatedUser = await User.findOneAndUpdate({ phone: req.body.phone }, req.body)
+    if (updatedUser) {
         res.status(200).json({
-            status:200,
-            message:"User updated Successfully"
+            status: 200,
+            message: "User updated Successfully"
         })
-    }else{
+    } else {
         res.status(400).json({
-            status:400,
-            message:"User updated Field"
+            status: 400,
+            message: "User updated Field"
         })
     }
 })
 
-module.exports = { registerUser, authUser, allUsers, fetchUserByPhoneNumber,updateUser }
+const addContact = asyncHandler(async (req, res) => {
+
+
+    const updatedUser = await User.findByIdAndUpdate(req.user._id, { $push: { contacts: req.body.userId } })
+
+    if (updatedUser) {
+        res.status(201).json({
+            status: 201,
+            message: "Contact added successfully"
+        })
+    } else {
+        res.status(400).json({
+            status: 400,
+            message: "User updated Field"
+        })
+    }
+})
+
+
+const fetchContacts = asyncHandler(async (req, res) => {
+
+
+    const user = await User.findById(req.user._id).populate("contacts", "-password -contacts")
+
+    if (user) {
+        res.status(201).send(user)
+    } else {
+        res.status(400).json({
+            status: 400,
+            message: "unknown error"
+        })
+    }
+})
+
+
+module.exports = { registerUser, authUser, allUsers, fetchUserByPhoneNumber, updateUser, addContact, fetchContacts }

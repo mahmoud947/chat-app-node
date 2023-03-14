@@ -11,13 +11,19 @@ const userSchema = mongoose.Schema(
             default:
                 "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
         },
-        phone: { type: "String", required: true }
+        phone: { type: "String", required: true, unique: true }
         ,
         isAdmin: {
             type: Boolean,
             required: true,
             default: false,
         },
+        contacts: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "User",
+            }
+        ]
     },
     { timestamps: true }
 );

@@ -31,12 +31,12 @@ const accessChat = asyncHandler(async (req, res) => {
             chatName: "sender",
             isGroupChat: false,
             users: [req.user._id, userId],
-            contact:userId
+            contact: userId
         }
 
         try {
             const createdChat = await Chat.create(chatData)
-            const FullChat = await Chat.findOne({ _id: createdChat._id }).populate("users", "-password").populate("contact","-password")
+            const FullChat = await Chat.findOne({ _id: createdChat._id }).populate("users", "-password").populate("contact", "-password")
             res.status(200).send(FullChat)
         } catch (error) {
 
@@ -47,9 +47,10 @@ const accessChat = asyncHandler(async (req, res) => {
 const fetchChats = asyncHandler(async (req, res) => {
     try {
         Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
-            .populate("users", "-password")
-            .populate("groupAdmin", "-password")
+            .populate("users", "-password -contacts")
+            .populate("groupAdmin", "-password -contacts")
             .populate("latestMessage")
+            .populate("contact", "-password -contacts")
             .sort({ updatedAt: -1 })
             .then(async (results) => {
                 results = await User.populate(results, {
