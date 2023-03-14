@@ -70,7 +70,6 @@ const authUser = asyncHandler(async (req, res) => {
     } else {
         res.status(401).json({
             message: "Invalid Email or Password",
-            message: "Successfully",
             status:400
         })
 
@@ -135,6 +134,11 @@ const updateUser = asyncHandler(async(req,res)=>{
         res.status(200).json({
             status:200,
             message:"User updated Successfully"
+        })
+    }else{
+        res.status(400).json({
+            status:400,
+            message:"User updated Field"
         })
     }
 })

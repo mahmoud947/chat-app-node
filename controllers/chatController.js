@@ -30,12 +30,13 @@ const accessChat = asyncHandler(async (req, res) => {
         var chatData = {
             chatName: "sender",
             isGroupChat: false,
-            users: [req.user._id, userId]
+            users: [req.user._id, userId],
+            contact:userId
         }
 
         try {
             const createdChat = await Chat.create(chatData)
-            const FullChat = await Chat.findOne({ _id: createdChat._id }).populate("users", "-password")
+            const FullChat = await Chat.findOne({ _id: createdChat._id }).populate("users", "-password").populate("contact","-password")
             res.status(200).send(FullChat)
         } catch (error) {
 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const User = require('./userModel')
 
 const chatModel = mongoose.Schema(
     {
@@ -10,6 +11,8 @@ const chatModel = mongoose.Schema(
                 ref: "User",
             }
         ],
+        contact:  {  type: mongoose.Schema.Types.ObjectId,
+            ref: "User",},
         latestMessage: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Message",
