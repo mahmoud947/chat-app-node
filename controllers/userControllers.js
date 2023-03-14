@@ -2,7 +2,22 @@ const asyncHandler = require("express-async-handler")
 const User = require("../models/userModel")
 const generateToken = require("../config/generateToken")
 const { find } = require("../models/userModel")
+const multer = require("multer")
+const path = require("path")
 
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        callback(null, './uploads')
+    },
+
+    filename: function (req, file, callback) {
+        callback(null, Date.now() + path.extname(file.originalname))
+    }
+
+})
+
+
+const upload = multer({ storage: storage })
 
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password, pic, phone } = req.body
@@ -151,6 +166,7 @@ const updateUser = asyncHandler(async (req, res) => {
         })
     }
 })
+
 
 const addContact = asyncHandler(async (req, res) => {
 

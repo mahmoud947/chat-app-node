@@ -9,9 +9,18 @@ const { Server } = require("socket.io")
 const WebSocket = require('ws')
 const { protect, protectSocketIo } = require("./middleware/authMiddleware")
 const Chat = require("./models/chatModel")
+const cors = require("cors")
 
 const app = express()
 
+app.use("/uploads", express.static("uploads"));
+
+
+const path = require("path")
+
+
+app.use(cors())
+app.use(express.urlencoded({ extended: true }));
 
 
 
@@ -22,8 +31,9 @@ connectDb()
 
 
 app.get('/', (req, res) => {
-    res.json({ message: "hello" })
+    res.json({ message: path.dirname })
 })
+
 
 
 // app.get('/api/chat', (req, res) => {
