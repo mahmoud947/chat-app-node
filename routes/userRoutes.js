@@ -32,7 +32,6 @@ router.route("/avatar").post(protect, upload.single('avatar'), async (req, res) 
     if (updatedUserAvatar) {
         res.status(200).json({ "message": "avatar updated successfully" })
     }
-
 })
 
 

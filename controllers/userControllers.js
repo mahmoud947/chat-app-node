@@ -35,7 +35,6 @@ const registerUser = asyncHandler(async (req, res) => {
             message: "User already exists",
             status: 400
         })
-
     }
 
     const user = await User.create({
@@ -88,6 +87,23 @@ const authUser = asyncHandler(async (req, res) => {
             status: 400
         })
 
+    }
+})
+
+const deleteAccount= asyncHandler(async(req,res)=>{
+    const deletedUser = await User.findByIdAndDelete(req.user._id)
+    if (deletedUser) {
+        res.status(200).json({
+            message:"user deleted successfully",
+            status:200
+        })
+    }else{
+        res.status(400).json(
+            {
+                message: "unkowen error",
+                status: 400
+            }
+        )
     }
 })
 
@@ -156,6 +172,7 @@ const updateUser = asyncHandler(async (req, res) => {
     const updatedUser = await User.findOneAndUpdate({ phone: req.body.phone }, req.body)
     if (updatedUser) {
         res.status(200).json({
+            user:updatedUser,
             status: 200,
             message: "User updated Successfully"
         })
@@ -169,7 +186,6 @@ const updateUser = asyncHandler(async (req, res) => {
 
 
 const addContact = asyncHandler(async (req, res) => {
-
 
     const updatedUser = await User.findByIdAndUpdate(req.user._id, { $push: { contacts: req.body.userId } })
 
@@ -203,4 +219,4 @@ const fetchContacts = asyncHandler(async (req, res) => {
 })
 
 
-module.exports = { registerUser, authUser, allUsers, fetchUserByPhoneNumber, updateUser, addContact, fetchContacts }
+module.exports = { registerUser, authUser, allUsers, fetchUserByPhoneNumber, updateUser, addContact, fetchContacts , deleteAccount}
