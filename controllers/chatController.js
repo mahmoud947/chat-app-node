@@ -31,7 +31,7 @@ const accessChat = asyncHandler(async (req, res) => {
             chatName: "sender",
             isGroupChat: false,
             users: [req.user._id, userId],
-            contact: [req.user._id,userId]
+            contact: [req.user._id, userId]
         }
 
         try {
@@ -46,11 +46,11 @@ const accessChat = asyncHandler(async (req, res) => {
 
 const fetchChats = asyncHandler(async (req, res) => {
     try {
-      Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
+        Chat.find({ users: { $elemMatch: { $eq: req.user._id } } })
             .populate("users", "-password -contacts")
             .populate("groupAdmin", "-password -contacts")
             .populate("latestMessage")
-            .populate("contact", "-password -contacts",{_id:{$ne: req.user._id}})
+            .populate("contact", "-password -contacts", { _id: { $ne: req.user._id } })
             .sort({ updatedAt: -1 })
             .then(async (results) => {
                 results = await User.populate(results, {
@@ -162,27 +162,29 @@ const removeFromGroup = asyncHandler(async (req, res) => {
 
 
 
-const searchChats = asyncHandler(async (req, res) => {
+const searchChatsR = asyncHandler(async (req, res) => {
 
-    const keyword = req.query.search
-        ? {
-            $or: [
-                { name: { $regex: req.query.search, $options: "i" } },
-                { email: { $regex: req.query.search, $options: "i" } },
-                { phone: { $regex: req.query.search, $options: "i" } },
-            ],
-        }
-        : {};
-    console.log(keyword);
+    const keyword = req.query.phone
+
 
     try {
-        const userSearched = await User.find(keyword)
-        console.log(userSearched);
-        Chat.find({ contact: userSearched })
+        const userSearched = await User.findOne({ phone: keyword })
+
+
+        console.log(userSearched._id);
+
+        Chat.find({
+            isGroupChat: false,
+            $and: [
+                { contact: { $elemMatch: { $eq: req.user._id.contacts } } },
+                { contact: { $elemMatch: { $ne: { _id: req.user._id } } } },
+            ]
+        })
             .populate("users", "-password -contacts")
             .populate("groupAdmin", "-password -contacts")
             .populate("latestMessage")
-            .populate("contact", "-password -contacts")
+            .populate("contact", "-password -contacts", { _id: { $ne: req.user._id } })
+
             .sort({ updatedAt: -1 })
             .then(async (results) => {
                 results = await User.populate(results, {
@@ -196,4 +198,4 @@ const searchChats = asyncHandler(async (req, res) => {
     }
 })
 
-module.exports = { accessChat, fetchChats, createGroupChat, renameGroup, addToGroup, removeFromGroup, searchChats }
+module.exports = { accessChat, fetchChats, createGroupChat, renameGroup, addToGroup, removeFromGroup, searchChatsR }

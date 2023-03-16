@@ -103,16 +103,16 @@ const deleteAccount = asyncHandler(async (req, res) => {
 
 const allUsers = asyncHandler(async (req, res) => {
   const keyword = req.query.search
-    ? {
-        $or: [
-          { name: { $regex: req.query.search, $options: "i" } },
-          { email: { $regex: req.query.search, $options: "i" } },
-          { phone: { $regex: req.query.search, $options: "i" } },
-        ],
-      }
-    : {};
+  // ? {
+  //   $or: [
+  //     { name: { $regex: req.query.search, $options: "i" } },
+  //     { email: { $regex: req.query.search, $options: "i" } },
+  //     { phone: { $regex: req.query.search, $options: "i" } },
+  //   ],
+  // }
+  // : {};
 
-  const users = await User.find(keyword).select("-password");
+  const users = await User.findOne({ phone: keyword }).select("-password");
   if (users) {
     res.status(200).json({
       users: users,
@@ -131,12 +131,12 @@ const allUsers = asyncHandler(async (req, res) => {
 const fetchUserByPhoneNumber = asyncHandler(async (req, res) => {
   const keyword = req.body
     ? {
-        $or: [
-          { name: req.body.name },
-          { email: req.body.email },
-          { phone: req.body.phone },
-        ],
-      }
+      $or: [
+        { name: req.body.name },
+        { email: req.body.email },
+        { phone: req.body.phone },
+      ],
+    }
     : {};
 
   const user = await User.findOne(keyword).select("-password");
