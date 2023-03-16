@@ -168,23 +168,20 @@ const searchChatsR = asyncHandler(async (req, res) => {
 
 
     try {
-        const userSearched = await User.findOne({ phone: keyword })
+        const userSearched = await User.find({ phone: keyword })
 
-
-        console.log(userSearched._id);
 
         Chat.find({
             isGroupChat: false,
             $and: [
-                { contact: { $elemMatch: { $eq: req.user._id.contacts } } },
-                { contact: { $elemMatch: { $ne: { _id: req.user._id } } } },
+                { users: { $elemMatch: { $eq: req.user._id } } },
+                { contact: { $elemMatch: { $in: userSearched } } },
             ]
         })
             .populate("users", "-password -contacts")
             .populate("groupAdmin", "-password -contacts")
             .populate("latestMessage")
             .populate("contact", "-password -contacts", { _id: { $ne: req.user._id } })
-
             .sort({ updatedAt: -1 })
             .then(async (results) => {
                 results = await User.populate(results, {
