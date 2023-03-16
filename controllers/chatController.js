@@ -31,7 +31,7 @@ const accessChat = asyncHandler(async (req, res) => {
             chatName: "sender",
             isGroupChat: false,
             users: [req.user._id, userId],
-            contact: userId
+            contact: [req.user._id,userId]
         }
 
         try {
@@ -50,7 +50,7 @@ const fetchChats = asyncHandler(async (req, res) => {
             .populate("users", "-password -contacts")
             .populate("groupAdmin", "-password -contacts")
             .populate("latestMessage")
-            .populate("contact", "-password -contacts",{_id:req.user._id})
+            .populate("contact", "-password -contacts",{_id:{$ne: req.user._id}})
             .sort({ updatedAt: -1 })
             .then(async (results) => {
                 results = await User.populate(results, {

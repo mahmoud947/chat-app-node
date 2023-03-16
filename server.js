@@ -5,6 +5,7 @@ const connectDb = require("./config/db")
 const userRoutes = require("./routes/userRoutes")
 const chatRoutes = require("./routes/chatRoutes")
 const messageRoutes = require('./routes/messageRoute')
+const termsRoutes = require('./routes/termsRoutes')
 const { Server } = require("socket.io")
 const WebSocket = require('ws')
 const { protect, protectSocketIo } = require("./middleware/authMiddleware")
@@ -51,6 +52,8 @@ app.use('/api/user', userRoutes)
 app.use('/api/chat', chatRoutes)
 
 app.use('/api/message', messageRoutes)
+
+app.use('/api/terms', termsRoutes)
 
 
 const PORT = process.env.PORT || 5000

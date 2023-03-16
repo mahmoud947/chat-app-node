@@ -34,7 +34,4 @@ router.route("/avatar").post(protect, upload.single('avatar'), async (req, res) 
     }
 })
 
-
-
-
 module.exports = router
