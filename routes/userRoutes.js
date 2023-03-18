@@ -7,6 +7,7 @@ const {
   updateUser,
   addContact,
   fetchContacts,
+  getUserInfo
 } = require('../controllers/userControllers')
 const { protect } = require('../middleware/authMiddleware')
 const multer = require('multer')
@@ -33,14 +34,28 @@ router.post('/forgetPassword', fetchUserByPhoneNumber)
 router.route('/edit').put(protect, updateUser)
 router.route('/addContact').post(protect, addContact)
 router.route('/contacts').get(protect, fetchContacts)
+router.route('/info').get(protect, getUserInfo)
 router
   .route('/avatar')
   .post(protect, upload.single('avatar'), async (req, res) => {
     const updatedUserAvatar = await User.findByIdAndUpdate(req.user._id, {
       pic: req.file.filename,
     })
+
+
+
     if (updatedUserAvatar) {
-      res.status(200).json({ message: 'avatar updated successfully' })
+      const user = await User.findOne(req.user._id)
+      res.status(200).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        pic: user.pic,
+        phone: user.phone,
+        token: req.headers.authorization.split(' ')[1],
+        message: 'avatar updated successfully',
+        status: 200
+      })
     }
   })
 

@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
+    "format": "prettier --write .",
     "deploy": "node server.js"
   },
   "author": "mahmoud kamal",
@@ -24,9 +25,6 @@
     "ws": "^8.13.0"
   },
   "devDependencies": {
-    "eslint": "^8.36.0",
-    "eslint-config-prettier": "^8.7.0",
-    "eslint-plugin-prettier": "^4.2.1",
     "prettier": "^2.8.4"
   }
 }

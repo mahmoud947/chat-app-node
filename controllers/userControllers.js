@@ -131,12 +131,12 @@ const allUsers = asyncHandler(async (req, res) => {
 const fetchUserByPhoneNumber = asyncHandler(async (req, res) => {
   const keyword = req.body
     ? {
-        $or: [
-          { name: req.body.name },
-          { email: req.body.email },
-          { phone: req.body.phone },
-        ],
-      }
+      $or: [
+        { name: req.body.name },
+        { email: req.body.email },
+        { phone: req.body.phone },
+      ],
+    }
     : {}
 
   const user = await User.findOne(keyword).select('-password')
@@ -156,16 +156,6 @@ const fetchUserByPhoneNumber = asyncHandler(async (req, res) => {
   }
 })
 
-// {
-//     "_id": "6412c2229addff76c03ad823",
-//     "name": "Alaa",
-//     "email": "alaa@gmail.com",
-//     "pic": "https://cdn-icons-png.flaticon.com/512/2202/2202112.png",
-//     "phone": "0123456789000",
-//     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MTJjMjIyOWFkZGZmNzZjMDNhZDgyMyIsImlhdCI6MTY3ODk1MjMwOSwiZXhwIjoxNjgxNTQ0MzA5fQ.lK7CUVr0phWk6BtSbwAsjKpDfYTYZYR7sA38LJs1Szg",
-//     "message": "Successfully",
-//     "status": 200
-// }
 
 const updateUser = asyncHandler(async (req, res) => {
   const updatedUser = await User.findOneAndUpdate(
@@ -227,6 +217,27 @@ const fetchContacts = asyncHandler(async (req, res) => {
   }
 })
 
+const getUserInfo = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id)
+  if (user) {
+    res.status(200).json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      pic: user.pic,
+      phone: user.phone,
+      token: req.headers.authorization.split(' ')[1],
+      message: 'user found successfully',
+      status: 200
+    })
+  } else {
+    res.status(400).json({
+      message: "User not found",
+      status: 400
+    })
+  }
+})
+
 module.exports = {
   registerUser,
   authUser,
@@ -236,4 +247,5 @@ module.exports = {
   addContact,
   fetchContacts,
   deleteAccount,
+  getUserInfo
 }
