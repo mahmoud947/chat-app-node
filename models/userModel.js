@@ -20,6 +20,7 @@ const userSchema = mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+        unique: true 
       },
     ],
   },

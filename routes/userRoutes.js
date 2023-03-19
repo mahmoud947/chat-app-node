@@ -7,7 +7,9 @@ const {
   updateUser,
   addContact,
   fetchContacts,
-  getUserInfo
+  getUserInfo,
+  searchInUserContent,
+  deleteUser
 } = require('../controllers/userControllers')
 const { protect } = require('../middleware/authMiddleware')
 const multer = require('multer')
@@ -29,11 +31,13 @@ const router = express.Router()
 
 router.route('/').get(protect, allUsers)
 router.route('/').post(registerUser)
+router.route('/').delete(protect,deleteUser)
 router.post('/login', authUser)
 router.post('/forgetPassword', fetchUserByPhoneNumber)
 router.route('/edit').put(protect, updateUser)
 router.route('/addContact').post(protect, addContact)
 router.route('/contacts').get(protect, fetchContacts)
+router.route('/contacts/search').get(protect,searchInUserContent)
 router.route('/info').get(protect, getUserInfo)
 router
   .route('/avatar')

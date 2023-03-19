@@ -1,7 +1,7 @@
 const asyncHandler = require('express-async-handler')
 const User = require('../models/userModel')
 const generateToken = require('../config/generateToken')
-const { find } = require('../models/userModel')
+const { find, findByIdAndDelete } = require('../models/userModel')
 const multer = require('multer')
 const path = require('path')
 
@@ -112,10 +112,11 @@ const allUsers = asyncHandler(async (req, res) => {
   // }
   // : {};
 
-  const users = await User.findOne({ phone: keyword }).select('-password')
+
+  const users = await User.findOne({ phone:{ $regex: keyword, $options: "i" }}).select('-password')
   if (users) {
     res.status(200).json({
-      users: users,
+     users: users,
       message: 'Successfully',
       status: 200,
     })
@@ -126,6 +127,26 @@ const allUsers = asyncHandler(async (req, res) => {
       status: 404,
     })
   }
+})
+
+const searchInUserContent = asyncHandler(async(req,res)=>{
+  const user =  await User.findById(req.user._id).populate(
+    'contacts',
+    '-password -contacts'
+  )
+  if (user) {
+    res.status(201).send(
+      user.contacts.filter((contact)=>{
+        return contact.phone.includes(req.query.phone)
+      })
+    )
+  } else {
+    res.status(400).json({
+      status: 400,
+      message: 'unknown error',
+    })
+  }
+
 })
 
 const fetchUserByPhoneNumber = asyncHandler(async (req, res) => {
@@ -184,8 +205,10 @@ const updateUser = asyncHandler(async (req, res) => {
 })
 
 const addContact = asyncHandler(async (req, res) => {
+  const contact = await User.findOne({phone:req.query.phone})
+
   const updatedUser = await User.findByIdAndUpdate(req.user._id, {
-    $push: { contacts: req.body.userId },
+    $push: { contacts: contact._id },
   })
 
   if (updatedUser) {
@@ -208,7 +231,7 @@ const fetchContacts = asyncHandler(async (req, res) => {
   )
 
   if (user) {
-    res.status(201).send(user)
+    res.status(201).send(user.contacts)
   } else {
     res.status(400).json({
       status: 400,
@@ -238,6 +261,21 @@ const getUserInfo = asyncHandler(async (req, res) => {
   }
 })
 
+const deleteUser = asyncHandler(async(req,res)=>{
+  const user = findByIdAndDelete(req.user._id)
+ if (user) {
+  res.status(200).json({
+    message: "User deleted successfully",
+    status: 200
+  })
+ } else {
+  res.status(400).json({
+    message: "User not found",
+    status: 400
+  })
+ }
+})
+
 module.exports = {
   registerUser,
   authUser,
@@ -247,5 +285,7 @@ module.exports = {
   addContact,
   fetchContacts,
   deleteAccount,
-  getUserInfo
+  getUserInfo,
+  searchInUserContent,
+  deleteUser
 }
