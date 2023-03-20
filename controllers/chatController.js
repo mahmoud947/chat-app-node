@@ -66,7 +66,15 @@ const fetchChats = asyncHandler(async (req, res, next) => {
                     select: 'name pic email',
                 }, { lean: true })
                 return res.status(200).send(results.map(item => {
-                    if (item?.contact?.length === 1) item.contact = item.contact[0]
+                    if (item?.contact?.length === 1){
+                        item.contact = item.contact[0]
+                    } else{
+                     item.contact = {
+                            _id: item._id,
+                            name: item.chatName,
+                            pic: "group.png",
+                     }
+                    }
                     return item
                 }))
             })

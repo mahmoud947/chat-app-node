@@ -42,10 +42,22 @@ const sendMessage = asyncHandler(async (req, res) => {
 
 const allMessages = asyncHandler(async (req, res) => {
   try {
-    const messages = await Message.find({ chat: req.params.chatId })
-      .populate('sender', 'name pic ,email, phone')
-      .populate('chat')
-    res.json(messages)
+    var messages = await Message.find({ chat: req.params.chatId })
+      .populate('sender', 'name pic email phone')
+      .populate('chat','-contact -latestMessage')
+      .populate('chat.users', '-password -contacts')
+      .lean() // Don't hydrate
+      .exec()
+      .then(async results => {
+        results = await User.populate(results, {
+            path: 'chat.users',
+            select: 'name pic email',
+        }, { lean: true })
+      
+        return res.status(200).send(results)
+    })
+   
+    //res.json(messages)
   } catch (error) {
     res.status(400).json(error)
   }
