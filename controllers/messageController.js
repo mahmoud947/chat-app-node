@@ -22,7 +22,7 @@ const sendMessage = asyncHandler(async (req, res) => {
   try {
     var message = await Message.create(newMessage)
     message = await message.populate('sender', 'name pic')
-    message = await message.populate('chat')
+    message = await message.populate('chat', '-contact -latestMessage')
     message = await message.populate('chat.contact', '-password -contacts', {
       _id: { $ne: req.user._id },
     })
@@ -31,9 +31,12 @@ const sendMessage = asyncHandler(async (req, res) => {
       select: 'name pic email',
     })
 
+
+
     await Chat.findByIdAndUpdate(req.body.chatId, {
       latestMessage: message,
     })
+    delete message.chat.contact
     res.json(message)
   } catch (error) {
     res.status(400).json(error)
@@ -44,19 +47,19 @@ const allMessages = asyncHandler(async (req, res) => {
   try {
     var messages = await Message.find({ chat: req.params.chatId })
       .populate('sender', 'name pic email phone')
-      .populate('chat','-contact -latestMessage')
+      .populate('chat', '-contact -latestMessage')
       .populate('chat.users', '-password -contacts')
       .lean() // Don't hydrate
       .exec()
       .then(async results => {
         results = await User.populate(results, {
-            path: 'chat.users',
-            select: 'name pic email',
+          path: 'chat.users',
+          select: 'name pic email',
         }, { lean: true })
-      
+
         return res.status(200).send(results)
-    })
-   
+      })
+
     //res.json(messages)
   } catch (error) {
     res.status(400).json(error)

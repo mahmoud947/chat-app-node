@@ -88,13 +88,15 @@ const bootStrap = async () => {
 
     socket.on('join chat', room => {
       socket.join(room)
-      console.log('User Joined Room: ' + room)
+      console.log('User Joined Room: ' + room._id)
     })
     socket.on('typing', room => socket.in(room).emit('typing'))
     socket.on('stop typing', room => socket.in(room).emit('stop typing'))
 
     socket.on('new message', newMessageRecieved => {
+      console.log(newMessageRecieved);
       var chat = newMessageRecieved.chat
+      console.log(chat);
 
       if (!chat.users) return console.log('chat.users not defined')
 
