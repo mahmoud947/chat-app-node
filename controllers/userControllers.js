@@ -113,10 +113,10 @@ const allUsers = asyncHandler(async (req, res) => {
   // : {};
 
 
-  const users = await User.findOne({ phone:{ $regex: keyword, $options: "i" }}).select('-password')
+  const users = await User.findOne({ phone: { $regex: keyword, $options: "i" } }).select('-password')
   if (users) {
     res.status(200).json({
-     users: users,
+      users: users,
       message: 'Successfully',
       status: 200,
     })
@@ -129,14 +129,14 @@ const allUsers = asyncHandler(async (req, res) => {
   }
 })
 
-const searchInUserContent = asyncHandler(async(req,res)=>{
-  const user =  await User.findById(req.user._id).populate(
+const searchInUserContent = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).populate(
     'contacts',
     '-password -contacts'
   )
   if (user) {
     res.status(201).send(
-      user.contacts.filter((contact)=>{
+      user.contacts.filter((contact) => {
         return contact.phone.includes(req.query.phone)
       })
     )
@@ -205,9 +205,10 @@ const updateUser = asyncHandler(async (req, res) => {
 })
 
 const addContact = asyncHandler(async (req, res) => {
-  const contact = await User.findOne({phone:req.query.phone})
+  const contact = await User.findOne({ phone: req.query.phone })
+  console.log(contact);
 
-  const updatedUser = await User.findByIdAndUpdate(req.user._id, {
+  const updatedUser = await User.updateOne({ _id: req.user._id }, {
     $push: { contacts: contact._id },
   })
 
@@ -261,19 +262,19 @@ const getUserInfo = asyncHandler(async (req, res) => {
   }
 })
 
-const deleteUser = asyncHandler(async(req,res)=>{
+const deleteUser = asyncHandler(async (req, res) => {
   const user = findByIdAndDelete(req.user._id)
- if (user) {
-  res.status(200).json({
-    message: "User deleted successfully",
-    status: 200
-  })
- } else {
-  res.status(400).json({
-    message: "User not found",
-    status: 400
-  })
- }
+  if (user) {
+    res.status(200).json({
+      message: "User deleted successfully",
+      status: 200
+    })
+  } else {
+    res.status(400).json({
+      message: "User not found",
+      status: 400
+    })
+  }
 })
 
 module.exports = {

@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema(
     password: { type: 'String', required: true },
     pic: {
       type: 'String',
-      default: 'https://cdn-icons-png.flaticon.com/512/2202/2202112.png',
+      default: '2202112.png',
     },
     phone: { type: 'String', required: true, unique: true },
     isAdmin: {
@@ -20,7 +20,7 @@ const userSchema = mongoose.Schema(
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        unique: true 
+
       },
     ],
   },
