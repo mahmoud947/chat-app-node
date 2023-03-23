@@ -262,6 +262,19 @@ const getUserInfo = asyncHandler(async (req, res) => {
   }
 })
 
+const getContactInfo = asyncHandler(async(req,res)=>{
+  const contact =  User.findById(req._id).select("-password -contacts")
+  if (contact) {
+      res.status(200).send(contact)
+  } else {
+    res.status(400).json({
+      status:400,
+      message:'user not found'
+    })
+  }
+
+})
+
 const deleteUser = asyncHandler(async (req, res) => {
   const user = findByIdAndDelete(req.user._id)
   if (user) {
