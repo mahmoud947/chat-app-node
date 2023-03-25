@@ -1,11 +1,13 @@
 const asyncHandler = require('express-async-handler')
 const Story = require('../models/storyModel')
 
+
 const addStory = asyncHandler(async (req, res) => {
 
     const story = {
         author: req.user._id,
         content: req.body.content,
+        image: req.file.filename,
         expireAfterSeconds: 10
     }
     const save = await Story.create(story)
@@ -23,3 +25,8 @@ const addStory = asyncHandler(async (req, res) => {
 module.exports = {
     addStory
 }
+
+// post(protect, upload.single('avatar'), async (req, res) => {
+//     const updatedUserAvatar = await User.findByIdAndUpdate(req.user._id, {
+//       pic: req.file.filename,
+//     })
