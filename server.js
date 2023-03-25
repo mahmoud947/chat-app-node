@@ -6,6 +6,7 @@ const userRoutes = require('./routes/userRoutes')
 const chatRoutes = require('./routes/chatRoutes')
 const messageRoutes = require('./routes/messageRoute')
 const termsRoutes = require('./routes/termsRoutes')
+const storyRoutes = require('./routes/storyRoutes')
 const { Server } = require('socket.io')
 const WebSocket = require('ws')
 const { protect, protectSocketIo } = require('./middleware/authMiddleware')
@@ -50,6 +51,8 @@ app.use('/api/chat', chatRoutes)
 app.use('/api/message', messageRoutes)
 
 app.use('/api/terms', termsRoutes)
+
+app.use('/api/story', storyRoutes)
 
 app.use((err, req, res, next) => {
   console.error(

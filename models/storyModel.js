@@ -10,6 +10,7 @@ const storyModel = mongoose.Schema(
         timestamps: true,
     },
 )
-
+storyModel.index({ createdAt: 1 }, { expireAfterSeconds: 10, unique: true });
 const Story = mongoose.model('Story', storyModel)
+
 module.exports = Story
