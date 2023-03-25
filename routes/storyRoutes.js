@@ -1,5 +1,5 @@
 const express = require('express')
-const { addStory } = require('../controllers/storyController')
+const { addStory, getStories } = require('../controllers/storyController')
 const { protect } = require('../middleware/authMiddleware')
 
 const multer = require('multer')
@@ -20,5 +20,6 @@ const upload = multer({ storage: storage })
 const router = express.Router()
 
 router.route('/').post(protect, upload.single('image'), addStory)
+router.route('/').get(protect, getStories)
 
 module.exports = router

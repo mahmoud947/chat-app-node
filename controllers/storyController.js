@@ -3,13 +3,24 @@ const Story = require('../models/storyModel')
 
 
 const addStory = asyncHandler(async (req, res) => {
-
-    const story = {
-        author: req.user._id,
-        content: req.body.content,
-        image: req.file.filename,
-        expireAfterSeconds: 10
+    var story = {}
+    if (req.file == null) {
+        story = {
+            author: req.user._id,
+            content: req.body.content,
+            expireAfterSeconds: 3600,
+            type: 1
+        }
+    } else {
+        story = {
+            author: req.user._id,
+            content: req.body.content,
+            image: req.file.filename,
+            expireAfterSeconds: 3600,
+            type: 2
+        }
     }
+
     const save = await Story.create(story)
     if (save) {
         res.json({
@@ -22,11 +33,19 @@ const addStory = asyncHandler(async (req, res) => {
     }
 })
 
+
+const getStories = asyncHandler(async (req, res) => {
+
+    const myStory = await Story.find({ author: req.user._id }).select('-author')
+    const stories = await Story.find({ author: req.user.contacts }).select('-author')
+    res.status(200).json({
+        myStories: myStory,
+        stories: stories
+    })
+})
+
 module.exports = {
-    addStory
+    addStory,
+    getStories
 }
 
-// post(protect, upload.single('avatar'), async (req, res) => {
-//     const updatedUserAvatar = await User.findByIdAndUpdate(req.user._id, {
-//       pic: req.file.filename,
-//     })
