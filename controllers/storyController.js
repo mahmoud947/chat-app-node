@@ -36,8 +36,8 @@ const addStory = asyncHandler(async (req, res) => {
 
 const getStories = asyncHandler(async (req, res) => {
 
-    const myStory = await Story.find({ author: req.user._id }).select('-author')
-    const stories = await Story.find({ author: req.user.contacts }).select('-author')
+    const myStory = await Story.find({ author: req.user._id }).populate('author','name pic email phone')
+    const stories = await Story.find({ author: req.user.contacts }).populate('author','name pic email phone')
     res.status(200).json({
         myStories: myStory,
         stories: stories
