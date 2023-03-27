@@ -205,24 +205,34 @@ const updateUser = asyncHandler(async (req, res) => {
 })
 
 const addContact = asyncHandler(async (req, res) => {
-  const contact = await User.findOne({ phone: req.query.phone })
-  console.log(contact);
 
-  const updatedUser = await User.updateOne({ _id: req.user._id }, {
-    $push: { contacts: contact._id },
-  })
+console.log(req.body);
 
-  if (updatedUser) {
-    res.status(201).json({
-      status: 201,
-      message: 'Contact added successfully',
+  const contact = await User.findOne({ phone: req.body.phone })
+  
+  try {
+    const updatedUser = await User.updateOne({ _id: req.user._id }, {
+      $push: { contacts: contact._id },
     })
-  } else {
+  
+    if (updatedUser) {
+      res.status(201).json({
+        status: 201,
+        message: 'Contact added successfully',
+      })
+    } else {
+      res.status(400).json({
+        status: 400,
+        message: 'User updated Field',
+      })
+    }
+  } catch (error) {
     res.status(400).json({
       status: 400,
       message: 'User updated Field',
     })
   }
+ 
 })
 
 const fetchContacts = asyncHandler(async (req, res) => {
